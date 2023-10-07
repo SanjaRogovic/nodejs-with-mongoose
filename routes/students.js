@@ -1,7 +1,10 @@
 import express from "express";
-import Student from "../models/Student";
+import Student from "../models/Student.js";
 
 const studentsRouter = express.Router()
+
+
+// Create new student
 
 studentsRouter.post("/", async (req, res) => {
     try  {
@@ -12,3 +15,5 @@ studentsRouter.post("/", async (req, res) => {
         res.status(500).res(error)
     }
 })
+
+export default studentsRouter
