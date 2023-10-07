@@ -10,7 +10,7 @@ Exercise 1
   https://www.mongodb.com/atlas/database
 
   Exercise 2
-- Create a mongoose schema student to save a student with :
+- Create a mongoose schema student to save a student with : 
     name (string)
     first_name (string)
     email (string)
