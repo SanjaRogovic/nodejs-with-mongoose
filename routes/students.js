@@ -96,16 +96,17 @@ studentsRouter.put("/updateMany/:first_name", async (req, res) => {
    
     try  {
         const {first_name} = req.params
-        const result = await Student.updateMany({first_name},  { first_name: "Bob"})
+        const {first_name_update} = req.body
+        const result = await Student.updateMany({first_name}, {$set: { first_name: first_name_update}})
         console.log(result)
 
-        if(result.modifiedCount.length > 0){
-            const update = await Student.find({first_name: "Bob"})
+        if(result.modifiedCount > 0){
+            const update = await Student.find({first_name: first_name_update})
             res.json(update)
         } else {
             res.status(404).json({message: "Student not found. Search by first name."})   
         } 
-        
+        // res.json(result)
     } catch (error) {
         console.log(error)
         res.status(500).res(error)
