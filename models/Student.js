@@ -14,10 +14,7 @@ const StudentSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
-        validate: {
-            validator: () => Promise.resolve(false),
-            message: 'Email validation failed - duplicate email'
-          }
+        unique: true
     }
 })
 

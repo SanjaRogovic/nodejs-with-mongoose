@@ -24,6 +24,13 @@ studentsRouter.post("/", async (req, res) => {
     try  {
         const {name, first_name, email} = req.body
         const result = await Student.create({name, first_name, email})
+
+        const validateEmail = await Student.findOne({email: email})
+
+        if (validateEmail){
+            return res.status(422).json({ message: "Email already exists" });
+        }
+        
         res.json(result)
     } catch (error) {
         res.status(500).json(error)
