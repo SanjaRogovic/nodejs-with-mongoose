@@ -16,4 +16,29 @@ studentsRouter.post("/", async (req, res) => {
     }
 })
 
+
+// Retrieve all students
+
+studentsRouter.get("/", async (req, res) => {
+    try  {
+        const result = await Student.find()
+        res.json(result)
+    } catch (error) {
+        res.status(500).res(error)
+    }
+})
+
+
+// Retrieve one student by id
+
+studentsRouter.get("/:id", async (req, res) => {
+    try  {
+        const {id} = req.params
+        const result = await Student.findById(id)
+        res.json(result)
+    } catch (error) {
+        res.status(500).res(error)
+    }
+})
+
 export default studentsRouter
