@@ -12,12 +12,6 @@ const oneStudentEdit = [
     body("email").isString().notEmpty().optional()
 ]
 
-/*const newStudentValidator = [
-    body("name").isString().notEmpty(),
-    body("first_name").isString().notEmpty(),
-    body("email").isString().notEmpty()
-]*/
-
 
 // CREATE A NEW STUDENT
 
@@ -32,7 +26,7 @@ studentsRouter.post("/", async (req, res) => {
         const result = await Student.create({name, first_name, email})
         res.json(result)
     } catch (error) {
-        res.status(500).res(error)
+        res.status(500).json(error)
     }
 })
 
@@ -44,7 +38,7 @@ studentsRouter.get("/", async (req, res) => {
         const result = await Student.find()
         res.json(result)
     } catch (error) {
-        res.status(500).res(error)
+        res.status(500).json(error)
     }
 })
 
@@ -61,7 +55,7 @@ studentsRouter.get("/:id", async (req, res) => {
         }
         res.json(result)
     } catch (error) {
-        res.status(500).res(error)
+        res.status(500).json(error)
     }
 })
 
@@ -85,12 +79,12 @@ studentsRouter.put("/:id", oneStudentEdit, async (req, res) => {
         }
         res.json(result)
     } catch (error) {
-        res.status(500).res(error)
+        res.status(500).json(error)
     }
 })
 
 
-// MODIFY ALL STUDENTS BY NAME
+// MODIFY ALL STUDENTS BY SAME NAME
 
 studentsRouter.put("/updateMany/:first_name", async (req, res) => {
    
@@ -109,7 +103,7 @@ studentsRouter.put("/updateMany/:first_name", async (req, res) => {
         // res.json(result)
     } catch (error) {
         console.log(error)
-        res.status(500).res(error)
+        res.status(500).json(error)
         
     }
 })
