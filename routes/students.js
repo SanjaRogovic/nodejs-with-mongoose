@@ -1,17 +1,7 @@
 import express from "express";
 import Student from "../models/Student.js";
-import {body, checkSchema, validationResult} from "express-validator"
 
 const studentsRouter = express.Router()
-
-// STUDENT VALIDATION
-
-const oneStudentEdit = [
-    body("name").isString().notEmpty().optional(),
-    body("first_name").isString().notEmpty().optional(),
-    body("email").isString().notEmpty().optional()
-]
-
 
 // CREATE A NEW STUDENT
 
@@ -31,7 +21,7 @@ studentsRouter.post("/", async (req, res) => {
             return res.status(422).json({ message: "Email already exists" });
         }
         
-        res.json(result)
+        res.status(201).json(result)
 
     } catch (error) {
         res.status(500).json(error)
@@ -44,7 +34,7 @@ studentsRouter.post("/", async (req, res) => {
 studentsRouter.get("/", async (req, res) => {
     try  {
         const result = await Student.find()
-        res.json(result)
+        res.status(201).json(result)
     } catch (error) {
         res.status(500).json(error)
     }
@@ -70,13 +60,7 @@ studentsRouter.get("/:id", async (req, res) => {
 
 // EDIT A STUDENT
 
-studentsRouter.put("/:id", oneStudentEdit, async (req, res) => {
-    const errors = validationResult(req)
-
-    if(!errors.isEmpty()){
-        return res.status(400).json({"EDIT INVALID": errors.array()})
-    }
-
+studentsRouter.put("/:id", async (req, res) => {
     try  {
         const {id} = req.params
         const {name, first_name, email} = req.body
@@ -85,7 +69,7 @@ studentsRouter.put("/:id", oneStudentEdit, async (req, res) => {
         if(result.length === 0){
             res.status(404).json({message: "Student not found"})
         }
-        res.json(result)
+        res.status(200).json(result)
     } catch (error) {
         res.status(500).json(error)
     }
@@ -106,11 +90,11 @@ studentsRouter.put("/updateMany/:first_name", async (req, res) => {
             const update = await Student.find({first_name: first_name_update})
             res.json(update)
         } else {
-            res.status(404).json({message: "Student not found. Search by first name."})   
+            res.status(404).json({message: "Student not updated"})   
         } 
         // res.json(result)
     } catch (error) {
-        console.log(error)
+        // console.log(error)
         res.status(500).json(error)
         
     }
@@ -124,6 +108,10 @@ studentsRouter.delete("/:id", async (req,res) => {
 
     try {
         const result = await Student.findByIdAndDelete(id)
+
+        if(!result){
+            res.status(404).json({message: "Student not found"})
+        }
         res.json(result)
     } catch (error) {
         res.status(500).json(error)
