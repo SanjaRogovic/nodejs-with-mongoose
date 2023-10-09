@@ -64,19 +64,19 @@ studentsRouter.put("/:id", async (req, res) => {
     try  {
         const {id} = req.params
         const {name, first_name, email} = req.body
-        const result = await Student.findByIdAndUpdate(id, {name, first_name, email})
+        const result = await Student.findByIdAndUpdate(id, {name, first_name, email}, {mew: true})
 
         if(result.length === 0){
             res.status(404).json({message: "Student not found"})
         }
-        res.status(200).json(result)
+        res.status(201).json(result)
     } catch (error) {
         res.status(500).json(error)
     }
 })
 
 
-// MODIFY ALL STUDENTS BY SAME NAME
+// MODIFY MANY STUDENTS BY NAME
 
 studentsRouter.put("/updateMany/:first_name", async (req, res) => {
    
