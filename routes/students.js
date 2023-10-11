@@ -31,6 +31,30 @@ studentsRouter.post("/", async (req, res) => {
 })
 
 
+
+// VERIFY TOKEN Middleware
+const secureMiddleware = ((req, res, next) => {
+    const {token} = req.params
+    const secureToken = process.env.TOKEN
+
+    if(!token || secureToken !== token || token.length < 3){
+        return res.status(403).json({message: "Unauthorized"})
+    } else {
+        next()
+    }
+})
+
+studentsRouter.get("/verify/:token", secureMiddleware, async (req, res) => {
+    try  {
+        const {token} = req.params
+        const result = await Student.find(token)
+        res.status(201).json(result)
+    } catch (error) {
+        res.status(500).json(error)
+    }
+})
+
+
 // RETRIEVE ALL STUDENTS
 
 studentsRouter.get("/", async (req, res) => {

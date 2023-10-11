@@ -6,21 +6,21 @@ import studentsRouter from "./routes/students.js"
 const app = express()
 
 // Middleware
-const secure = ((req, res, next) => {
-    const {token} = req.body
-    const secretToken = process.env.TOKEN
+// const secure = ((req, res, next) => {
+//     const {token} = req.body
+//     const secretToken = process.env.TOKEN
 
-    if (!token || secretToken !== token) {
-        res.status(403).json({message: "Unauthorized"})
-    } else {
-        next()
-    }
-})
+//     if (!token || secretToken !== token) {
+//         res.status(403).json({message: "Unauthorized"})
+//     } else {
+//         next()
+//     }
+// })
 
 
 app.use(express.json())
 
-studentsRouter.use(secure)
+// studentsRouter.use(secure)
 
 app.use("/api/students", studentsRouter)
 
