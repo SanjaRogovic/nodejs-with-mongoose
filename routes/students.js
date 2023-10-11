@@ -3,6 +3,8 @@ import Student from "../models/Student.js";
 
 const studentsRouter = express.Router()
 
+
+
 // CREATE A NEW STUDENT
 
 /*If the user sends a POST request, create a database document with:
