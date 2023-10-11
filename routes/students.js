@@ -4,7 +4,6 @@ import Student from "../models/Student.js";
 const studentsRouter = express.Router()
 
 
-
 // CREATE A NEW STUDENT
 
 /*If the user sends a POST request, create a database document with:
@@ -77,7 +76,7 @@ studentsRouter.get("/:id", async (req, res) => {
         if(!id){
             return res.status(404).json({message: "Student not found"})
         }
-        res.json(result)
+        res.status(201).json(result)
     } catch (error) {
         res.status(500).json(error)
     }
@@ -122,7 +121,6 @@ studentsRouter.put("/updateMany/:first_name", async (req, res) => {
     } catch (error) {
         // console.log(error)
         res.status(500).json(error)
-        
     }
 })
 
@@ -138,11 +136,22 @@ studentsRouter.delete("/:id", async (req,res) => {
         if(!result){
             res.status(404).json({message: "Student not found"})
         }
-        res.json(result)
+        res.status(201).json(result)
     } catch (error) {
         res.status(500).json(error)
     }
+})
 
+
+// DELETE ALL STUDENTS
+
+studentsRouter.delete("/", async (req, res) => {
+    try {
+        const result = await Student.deleteMany({})
+        res.status(201).json(result)
+    } catch(error) {
+        res.status(500).json(error)
+    }
 })
 
 export default studentsRouter
