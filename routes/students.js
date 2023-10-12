@@ -1,5 +1,6 @@
 import express from "express";
 import Student from "../models/Student.js";
+import Token from "../models/Token.js";
 
 const studentsRouter = express.Router()
 
@@ -30,23 +31,45 @@ studentsRouter.post("/", async (req, res) => {
 })
 
 
-
-// VERIFY TOKEN Middleware
-const secureMiddleware = ((req, res, next) => {
+// TOKEN Middleware - routing level
+const secure = ((req, res, next) => {
     const {token} = req.params
-    const secureToken = process.env.TOKEN
 
-    if(!token || secureToken !== token || token.length < 3){
-        return res.status(403).json({message: "Unauthorized"})
-    } else {
+    if(token && token.length > 3){  //evaluate if token exists and if length is more than 3 characters
         next()
+    } else {
+        next({statusCode: 403, message: "Forbidden"}) 
+    }
+
+    // if(!token || secureToken !== token || token.length < 3){
+    //     return res.status(403).json({message: "Forbidden"})
+    // } else {
+    //     next()
+    // }
+})
+
+
+studentsRouter.post("/create-token/:userId", async (req, res) => {
+    try  {
+        const {tokenData} = req.body.token
+
+        // save token to the database
+        const token = await Token.create({value: tokenData})    
+        
+        if(!token){
+            return res.status(403).json({message: "Token not created"})
+        }
+        res.status(201).json(token)
+
+    } catch (error) {
+        res.status(500).json(error)
     }
 })
 
-studentsRouter.get("/verify/:token", secureMiddleware, async (req, res) => {
+
+studentsRouter.get("/verify/:token", secure, async (req, res) => {
     try  {
-        const {token} = req.params
-        const result = await Student.find(token)
+        const result = await Student.find()
         res.status(201).json(result)
     } catch (error) {
         res.status(500).json(error)

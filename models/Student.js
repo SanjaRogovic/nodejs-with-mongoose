@@ -25,6 +25,11 @@ const StudentSchema = new mongoose.Schema({
         trim: true,
         minlength: 1,
         maxlength: 100
+    },
+
+    tokenId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Token"
     }
 })
 

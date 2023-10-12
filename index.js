@@ -3,9 +3,10 @@ import "dotenv/config"
 import client from "./db/db.js"
 import studentsRouter from "./routes/students.js"
 
+
 const app = express()
 
-// Middleware
+// Middleware - application level
 // const secure = ((req, res, next) => {
 //     const {token} = req.body
 //     const secretToken = process.env.TOKEN
