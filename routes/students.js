@@ -13,19 +13,19 @@ first_name: “Doe”
 email: “john@doe.com“*/
 
 studentsRouter.post("/", async (req, res) => {
+    const {name, first_name, email} = req.body
     try  {
-        const {name, first_name, email} = req.body
-        const result = await Student.create({name, first_name, email})
-
+        const response = await Student.create({name, first_name, email})
         const validateEmail = await Student.findOne({email: email})
 
         if (validateEmail){
             return res.status(422).json({ message: "Email already exists" });
         }
-        
-        res.status(201).json(result)
-
+        res.status(201).json(response)
     } catch (error) {
+        if (err.code === 11000 && err.keyPattern && err.keyPattern.email) {
+            return res.status(400).json({ error: 'Email already exists.' });
+        }
         res.status(500).json(error)
     }
 })
@@ -34,14 +34,14 @@ studentsRouter.post("/", async (req, res) => {
 // TOKEN Middleware - routing level
 const secure = ((req, res, next) => {
     const {token} = req.params
-
     if(token && token.length > 3){  //evaluate if token exists and if length is more than 3 characters
         next()
     } else {
         next({statusCode: 403, message: "Forbidden"}) 
     }
 
-    // if(!token || secureToken !== token || token.length < 3){
+    //const secretToken = process.env.TOKEN;
+    // if(!token || secretToken !== token){
     //     return res.status(403).json({message: "Forbidden"})
     // } else {
     //     next()
@@ -50,9 +50,8 @@ const secure = ((req, res, next) => {
 
 
 studentsRouter.post("/create-token/:userId", async (req, res) => {
+    const {tokenData} = req.body.token
     try  {
-        const {tokenData} = req.body.token
-
         // save token to the database
         const token = await Token.create({value: tokenData})    
         
@@ -60,7 +59,6 @@ studentsRouter.post("/create-token/:userId", async (req, res) => {
             return res.status(403).json({message: "Token not created"})
         }
         res.status(201).json(token)
-
     } catch (error) {
         res.status(500).json(error)
     }
@@ -81,8 +79,8 @@ studentsRouter.get("/verify/:token", secure, async (req, res) => {
 
 studentsRouter.get("/", async (req, res) => {
     try  {
-        const result = await Student.find()
-        res.status(201).json(result)
+        const response = await Student.find()
+        res.status(201).json(response)
     } catch (error) {
         res.status(500).json(error)
     }
@@ -92,14 +90,14 @@ studentsRouter.get("/", async (req, res) => {
 // RETRIEVE ONE STUDENT BY ID
 
 studentsRouter.get("/:id", async (req, res) => {
+    const {id} = req.params
     try  {
-        const {id} = req.params
-        const result = await Student.findById(id)
+        const response = await Student.findById(id)
 
         if(!id){
             return res.status(404).json({message: "Student not found"})
         }
-        res.status(201).json(result)
+        res.status(201).json(response)
     } catch (error) {
         res.status(500).json(error)
     }
@@ -108,16 +106,16 @@ studentsRouter.get("/:id", async (req, res) => {
 
 // EDIT A STUDENT
 
-studentsRouter.put("/:id", async (req, res) => {
+studentsRouter.put("/oneStudent/:id", async (req, res) => {
+    const {id} = req.params
+    const {name, first_name, email} = req.body
     try  {
-        const {id} = req.params
-        const {name, first_name, email} = req.body
-        const result = await Student.findByIdAndUpdate(id, {name, first_name, email}, {new: true})
+        const response = await Student.findByIdAndUpdate(id, {name, first_name, email}, {new: true})
 
-        if(!result){
+        if(!response){
             res.status(404).json({message: "Student not found"})
         }
-        res.status(201).json(result)
+        res.status(201).json(response)
         
     } catch (error) {
         res.status(500).json(error)
@@ -127,21 +125,20 @@ studentsRouter.put("/:id", async (req, res) => {
 
 // MODIFY MANY STUDENTS BY NAME
 
-studentsRouter.put("/updateMany/:first_name", async (req, res) => {
-   
+studentsRouter.put("/manyStudents/:name", async (req, res) => {
+    const {first_name} = req.params
+    const {first_name_update} = req.body
     try  {
-        const {first_name} = req.params
-        const {first_name_update} = req.body
-        const result = await Student.updateMany({first_name}, {$set: { first_name: first_name_update}})
-        console.log(result)
+        const response = await Student.updateMany({first_name}, {$set: { first_name: first_name_update}})
+        console.log(response)
 
-        if(result.modifiedCount > 0){
-            const update = await Student.find({first_name: first_name_update})
-            res.json(update)
+        if(response.modifiedCount > 0){
+            const updatedStudent = await Student.find({first_name: first_name_update})
+            res.json(updatedStudent)
         } else {
             res.status(404).json({message: "Student not updated"})   
         } 
-        // res.json(result)
+        // res.json(response)
     } catch (error) {
         // console.log(error)
         res.status(500).json(error)
@@ -153,14 +150,13 @@ studentsRouter.put("/updateMany/:first_name", async (req, res) => {
 
 studentsRouter.delete("/:id", async (req,res) => {
     const {id} = req.params
-
     try {
-        const result = await Student.findByIdAndDelete(id)
+        const response = await Student.findByIdAndDelete(id)
 
-        if(!result){
+        if(!response){
             res.status(404).json({message: "Student not found"})
         }
-        res.status(201).json(result)
+        res.status(201).json(response)
     } catch (error) {
         res.status(500).json(error)
     }
@@ -171,8 +167,8 @@ studentsRouter.delete("/:id", async (req,res) => {
 
 studentsRouter.delete("/", async (req, res) => {
     try {
-        const result = await Student.deleteMany({})
-        res.status(201).json(result)
+        const response = await Student.deleteMany({})
+        res.status(201).json(response)
     } catch(error) {
         res.status(500).json(error)
     }
